@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yifan Yao - Data & Creativity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    /* ========== RESET & BASE ========== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --cream: #FFF8F0;
+      --warm-white: #FFFDF9;
+      --peach: #FFDAB9;
+      --coral: #FF8C6B;
+      --coral-deep: #E8735A;
+      --amber: #FFB347;
+      --amber-light: #FFD699;
+      --rose: #F4A0A0;
+      --lavender: #C3B1E1;
+      --sage: #A8C5A0;
+      --sky: #A8D8EA;
+      --charcoal: #2D2D2D;
+      --text: #3D3530;
+      --text-light: #7A6F66;
+      --text-lighter: #A89F97;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text);
+      background: var(--cream);
+      overflow-x: hidden;
+      cursor: default;
+      line-height: 1.6;
+    }
+
+    ::selection {
+      background: var(--peach);
+      color: var(--charcoal);
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    em {
+      font-style: italic;
+      color: var(--coral-deep);
+    }
+
+
+    /* ========== GRAIN OVERLAY ========== */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9990;
+    }
+
+    /* ========== BACKGROUND BLOBS ========== */
+    .bg-blobs {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.3;
+      animation: blobFloat 20s ease-in-out infinite;
+    }
+    .blob-1 {
+      width: 600px; height: 600px;
+      background: var(--peach);
+      top: -10%; right: -10%;
+      animation-delay: 0s;
+    }
+    .blob-2 {
+      width: 500px; height: 500px;
+      background: var(--lavender);
+      bottom: 10%; left: -5%;
+      animation-delay: -7s;
+    }
+    .blob-3 {
+      width: 400px; height: 400px;
+      background: var(--amber-light);
+      top: 40%; right: 20%;
+      animation-delay: -14s;
+    }
+    .blob-4 {
+      width: 350px; height: 350px;
+      background: var(--sage);
+      top: 60%; left: 30%;
+      animation-delay: -10s;
+      opacity: 0.2;
+    }
+
+    @keyframes blobFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -50px) scale(1.05); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+      75% { transform: translate(40px, 30px) scale(1.02); }
+    }
+
+    /* ========== NAVIGATION ========== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    nav.scrolled {
+      background: rgba(255, 248, 240, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 14px 40px;
+      box-shadow: 0 1px 20px rgba(0,0,0,0.04);
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--coral-deep);
+      letter-spacing: -0.02em;
+      transition: transform 0.3s;
+    }
+    .nav-logo:hover { transform: rotate(-3deg) scale(1.05); }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 8px;
+    }
+    .nav-link {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-light);
+      padding: 8px 16px;
+      border-radius: 100px;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .nav-link:hover, .nav-link.active {
+      color: var(--coral-deep);
+      background: rgba(255, 140, 107, 0.1);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      z-index: 1001;
+    }
+    .hamburger span {
+      width: 24px; height: 2px;
+      background: var(--text);
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 248, 240, 0.97);
+      backdrop-filter: blur(20px);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--text);
+      transition: color 0.3s;
+    }
+    .mobile-menu a:hover { color: var(--coral); }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      nav.scrolled { padding: 12px 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    /* ========== SECTION COMMONS ========== */
+    .section {
+      padding: 120px 0;
+      position: relative;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--coral);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label span {
+      background: var(--coral);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+    }
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 600;
+      line-height: 1.2;
+      color: var(--charcoal);
+      max-width: 700px;
+      margin-bottom: 48px;
+    }
+
+    /* ========== REVEAL ANIMATIONS ========== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ========== HERO ========== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+    }
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 140, 107, 0.12);
+      color: var(--coral-deep);
+      padding: 8px 18px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+    .badge-dot {
+      width: 8px; height: 8px;
+      background: #4CAF50;
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5.5vw, 4.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--charcoal);
+      margin-bottom: 24px;
+    }
+    .hero-title .line { display: block; }
+    .hero-title .line:nth-child(2) { margin-top: 8px; }
+
+    .rotating-words {
+      display: inline-block;
+      position: relative;
+      color: var(--coral);
+      min-width: 120px;
+    }
+    .rw-word {
+      display: inline-block;
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(20px);
+    }
+    .rw-word.active {
+      opacity: 1;
+      position: relative;
+      transform: translateY(0);
+    }
+    .rw-word.exit {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      max-width: 500px;
+      margin-bottom: 36px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      border: none;
+    }
+    .btn-warm {
+      background: linear-gradient(135deg, var(--coral) 0%, var(--amber) 100%);
+      color: white;
+      box-shadow: 0 4px 20px rgba(255, 140, 107, 0.3);
+    }
+    .btn-warm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 140, 107, 0.4);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid rgba(45, 45, 45, 0.15);
+    }
+    .btn-ghost:hover {
+      border-color: var(--coral);
+      color: var(--coral);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Photo */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .hero-photo-wrapper {
+      position: relative;
+      width: 380px;
+      height: 480px;
+    }
+    .hero-photo-frame {
+      width: 100%;
+      height: 100%;
+      border-radius: 200px 200px 40px 40px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    }
+    .hero-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+      transition: transform 6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-photo-frame:hover .hero-photo {
+      transform: scale(1.05);
+    }
+    .photo-deco-1 {
+      position: absolute;
+      width: 120px; height: 120px;
+      border: 3px solid var(--peach);
+      border-radius: 50%;
+      top: -30px; right: -30px;
+      animation: floatSoft 6s ease-in-out infinite;
+    }
+    .photo-deco-2 {
+      position: absolute;
+      width: 80px; height: 80px;
+      background: var(--amber-light);
+      border-radius: 50%;
+      bottom: 20px; left: -40px;
+      opacity: 0.6;
+      animation: floatSoft 8s ease-in-out infinite reverse;
+    }
+    .photo-deco-3 {
+      position: absolute;
+      width: 40px; height: 40px;
+      background: var(--lavender);
+      border-radius: 12px;
+      top: 60px; left: -20px;
+      opacity: 0.5;
+      animation: floatSoft 5s ease-in-out infinite;
+      transform: rotate(45deg);
+    }
+
+    @keyframes floatSoft {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(5deg); }
+    }
+
+    /* Floating tags */
+    .floating-tags {
+      position: absolute;
+      width: 100%; height: 100%;
+      top: 0; left: 0;
+      pointer-events: none;
+    }
+    .ftag {
+      position: absolute;
+      background: white;
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      animation: floatTag 4s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    .ftag-1 { top: 10%; right: -10%; color: var(--coral); animation-delay: 0s; }
+    .ftag-2 { bottom: 30%; right: -15%; color: var(--lavender); animation-delay: -1s; }
+    .ftag-3 { top: 30%; left: -15%; color: var(--sage); animation-delay: -2s; }
+    .ftag-4 { bottom: 10%; left: -10%; color: var(--amber); animation-delay: -3s; }
+
+    @keyframes floatTag {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Scroll indicator */
+    .scroll-cue {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .scroll-text {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--text-lighter);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--coral), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 1; transform: scaleY(1); }
+      50% { opacity: 0.3; transform: scaleY(0.6); }
+    }
+
+    @media (max-width: 768px) {
+      .hero .container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-desc { margin: 0 auto 36px; }
+      .hero-actions { justify-content: center; }
+      .hero-photo-wrapper { width: 280px; height: 360px; margin: 0 auto; }
+      .floating-tags { display: none; }
+      .scroll-cue { display: none; }
+    }
+
+    /* ========== ABOUT ========== */
+    .about-section .about-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+    .about-heading {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 24px;
+      color: var(--charcoal);
+    }
+    .about-bio p {
+      color: var(--text-light);
+      line-height: 1.8;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+    }
+
+    .about-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .about-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .about-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    }
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+    .about-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--charcoal);
+    }
+    .about-card p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+    .card-small {
+      font-size: 0.75rem !important;
+      color: var(--coral) !important;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag-cloud span {
+      background: rgba(255, 140, 107, 0.1);
+      color: var(--coral-deep);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .tech-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .pill {
+      background: var(--charcoal);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      font-family: var(--font-mono);
+    }
+
+    @media (max-width: 768px) {
+      .about-section .about-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ========== MARQUEE STRIP ========== */
+    .marquee-strip {
+      overflow: hidden;
+      padding: 24px 0;
+      background: var(--charcoal);
+      position: relative;
+    }
+    .marquee-track {
+      display: flex;
+      gap: 48px;
+      animation: marquee 30s linear infinite;
+      width: max-content;
+    }
+    .marquee-item {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.6);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .marquee-item .dot {
+      width: 6px; height: 6px;
+      background: var(--coral);
+      border-radius: 50%;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ========== JOURNEY / TIMELINE ========== */
+    .journey-section {
+      background: linear-gradient(180deg, var(--cream) 0%, var(--warm-white) 100%);
+    }
+    .timeline {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .timeline-line {
+      position: absolute;
+      left: 50%;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--peach), var(--lavender), var(--sage));
+      transform: translateX(-50%);
+    }
+    .tl-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 48px;
+      position: relative;
+    }
+    .tl-item:last-child { margin-bottom: 0; }
+
+    .tl-left { justify-content: flex-start; padding-right: calc(50% + 40px); }
+    .tl-right { justify-content: flex-end; padding-left: calc(50% + 40px); }
+
+    .tl-item::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 24px;
+      width: 14px; height: 14px;
+      background: white;
+      border: 3px solid var(--coral);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      transition: all 0.3s;
+    }
+    .tl-item:hover::before {
+      background: var(--coral);
+      transform: translateX(-50%) scale(1.3);
+    }
+
+    .tl-card {
+      background: white;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(0,0,0,0.04);
+      width: 100%;
+    }
+    .tl-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    }
+    .tl-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--coral);
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .tl-company {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+    .tl-role {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    .tl-card > p {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .tl-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tl-tags span {
+      background: rgba(255, 140, 107, 0.08);
+      color: var(--coral-deep);
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .timeline-line { left: 20px; }
+      .tl-item { padding-right: 0 !important; padding-left: 56px !important; justify-content: flex-start !important; }
+      .tl-item::before { left: 20px; }
+    }
+
+    /* ========== PROJECTS ========== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .proj-card {
+      background: white;
+      border-radius: 24px;
+      overflow: hidden;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      border: 1px solid rgba(0,0,0,0.04);
+      position: relative;
+    }
+    .proj-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    }
+    .proj-card.proj-large {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+    }
+    .proj-visual {
+      background: var(--grad, linear-gradient(135deg, #FF8C6B, #FFB347));
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      position: relative;
+      overflow: hidden;
+    }
+    .proj-visual::before {
+      content: '';
+      position: absolute;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: shimmer 8s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%, 100% { transform: translate(-30%, -30%); }
+      50% { transform: translate(30%, 30%); }
+    }
+    .proj-visual-inner {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .proj-icon-big {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    }
+    .proj-diagram {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.2);
+      padding: 12px 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+    .proj-diagram span {
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .proj-diagram .arrow { opacity: 0.6; }
+
+    .proj-info {
+      padding: 32px;
+    }
+    .proj-category {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--coral);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .proj-info h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--charcoal);
+    }
+    .proj-info p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .proj-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .proj-tech span {
+      font-family: var(--font-mono);
+      background: var(--cream);
+      color: var(--text-light);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+    }
+
+    @media (max-width: 768px) {
+      .projects-grid { grid-template-columns: 1fr; }
+      .proj-card.proj-large { grid-template-columns: 1fr; }
+    }
+
+    /* ========== MY WORLD ========== */
+    .world-section {
+      background: linear-gradient(180deg, var(--warm-white) 0%, var(--cream) 100%);
+    }
+    .world-intro {
+      font-size: 1.05rem;
+      color: var(--text-light);
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+    /* ===== SIDE NAV DOTS ===== */
+
+    /* ===== WORLD FLIP CARDS ===== */
+    .world-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+    @media (max-width: 768px) {
+      .world-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .flip-card {
+      perspective: 1000px;
+      height: 300px;
+      cursor: pointer;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-style: preserve-3d;
+    }
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .flip-card-front {
+      background: white;
+      padding: 32px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      transition: box-shadow 0.3s;
+    }
+    .flip-card:hover .flip-card-front {
+      box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+    }
+    .flip-card-back {
+      transform: rotateY(180deg);
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--charcoal);
+    }
+    /* Carousel on the back */
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 20px;
+    }
+    .carousel-track {
+      display: flex;
+      height: 100%;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .carousel-slide {
+      min-width: 100%;
+      height: 100%;
+    }
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .carousel-dots {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+    .carousel-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transition: all 0.3s;
+    }
+    .carousel-dot.active {
+      background: white;
+      transform: scale(1.3);
+    }
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.3);
+      color: white;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 2;
+    }
+    .carousel-arrow:hover { background: rgba(0,0,0,0.6); }
+    .carousel-arrow.prev { left: 8px; }
+    .carousel-arrow.next { right: 8px; }
+    .flip-hint {
+      font-size: 0.65rem;
+      color: var(--text-lighter);
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .flip-card:hover .flip-hint { opacity: 1; }
+    .wc-emoji {
+      font-size: 2.8rem;
+      margin-bottom: 16px;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .flip-card:hover .wc-emoji {
+      transform: scale(1.2) rotate(10deg);
+    }
+    .world-card-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--charcoal);
+    }
+
+    .world-quote {
+      text-align: center;
+      padding: 60px 40px;
+      background: white;
+      border-radius: 24px;
+      position: relative;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.03);
+    }
+    .world-quote::before {
+      content: '\201C';
+      position: absolute;
+      top: 20px; left: 40px;
+      font-family: var(--font-display);
+      font-size: 6rem;
+      color: var(--peach);
+      line-height: 1;
+      opacity: 0.5;
+    }
+    .world-quote blockquote {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      font-style: italic;
+      color: var(--charcoal);
+      line-height: 1.5;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .world-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .world-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ========== FUN FACTS STRIP ========== */
+    .fun-facts {
+      padding: 80px 0;
+      text-align: center;
+    }
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .fact-item {
+      padding: 24px;
+    }
+    .fact-number {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--coral);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .fact-label {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .facts-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ========== CONTACT ========== */
+    .contact-section {
+      padding-bottom: 80px;
+    }
+    .contact-heading {
+      text-align: center;
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .contact-desc {
+      text-align: center;
+      color: var(--text-light);
+      font-size: 1rem;
+      max-width: 500px;
+      margin: -24px auto 48px;
+      line-height: 1.7;
+    }
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .contact-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: white;
+      padding: 18px 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    .contact-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      border-color: var(--coral);
+    }
+    .cb-icon {
+      width: 40px; height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--coral), var(--amber));
+      color: white;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .cb-icon svg { fill: white; }
+    .cb-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* ========== FOOTER ========== */
+    footer {
+      padding: 40px 0;
+      text-align: center;
+      border-top: 1px solid rgba(0,0,0,0.06);
+    }
+    footer p {
+      font-size: 0.82rem;
+      color: var(--text-lighter);
+    }
+    .footer-sub {
+      font-size: 0.72rem !important;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* ========== MAGNETIC BUTTON EFFECT ========== */
+    .magnetic {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ========== PAGE LOADER ========== */
+    .loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: var(--cream);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+      transition: opacity 0.6s, visibility 0.6s;
+    }
+    .loader.done {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loader-text {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--charcoal);
+      overflow: hidden;
+    }
+    .loader-bar {
+      width: 120px; height: 3px;
+      background: var(--peach);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .loader-fill {
+      height: 100%;
+      background: var(--coral);
+      border-radius: 3px;
+      animation: loadFill 1.2s ease-out forwards;
+    }
+    @keyframes loadFill {
+      0% { width: 0; }
+      100% { width: 100%; }
+    }
+
+    /* ========== SPARKLE ON CLICK ========== */
+    .sparkle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9995;
+    }
+    .sparkle-particle {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      animation: sparkleOut 0.6s ease-out forwards;
+    }
+    @keyframes sparkleOut {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+    }
+
+    /* ========== SMOOTH SECTION DIVIDER ========== */
+    .wave-divider {
+      width: 100%;
+      line-height: 0;
+      margin-top: -1px;
+    }
+    .wave-divider svg {
+      width: 100%;
+      height: 60px;
+    }
+
+    /* ========== TILT CARD EFFECT ========== */
+    .tilt-card {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    /* ========== CARD CTA ========== */
+    .wc-cta {
+      margin-top: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-lighter);
+      transition: all 0.3s;
+      opacity: 0;
+    }
+    .world-card:hover .wc-cta {
+      opacity: 1;
+      color: var(--coral);
+    }
+
+    .proj-cta {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--coral);
+      transition: all 0.3s;
+    }
+    .proj-card:hover .proj-cta {
+      transform: translateX(6px);
+    }
+
+    /* ========== PROJECT MODAL ========== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+    .modal-content {
+      background: var(--cream);
+      border-radius: 24px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      position: relative;
+      animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.15);
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.9);
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      transition: all 0.3s;
+      color: var(--text);
+    }
+    .modal-close:hover {
+      background: white;
+      transform: rotate(90deg);
+    }
+    .modal-header {
+      padding: 48px 40px 36px;
+      border-radius: 24px 24px 0 0;
+      color: white;
+      text-align: center;
+    }
+    .modal-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    .modal-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .modal-subtitle {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+    .modal-body {
+      padding: 36px 40px 40px;
+    }
+    .modal-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--charcoal);
+      margin-bottom: 12px;
+      margin-top: 24px;
+    }
+    .modal-body h3:first-child { margin-top: 0; }
+    .modal-body p {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+    .modal-body ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 16px;
+    }
+    .modal-body ul li {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      line-height: 1.7;
+      padding-left: 20px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .modal-body ul li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 10px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--coral);
+    }
+    .modal-body .proj-tech {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .modal-content { max-height: 90vh; }
+      .modal-header { padding: 36px 24px 28px; }
+      .modal-header h2 { font-size: 1.4rem; }
+      .modal-body { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page Loader -->
+  <div class="loader" id="loader">
+    <div class="loader-text">YY.</div>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+
+  <!-- Background Blobs -->
+  <div class="bg-blobs" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <a href="#home" class="nav-logo magnetic">YY.</a>
+    <ul class="nav-links">
+      <li><a href="#home" class="nav-link active">Home</a></li>
+      <li><a href="#about" class="nav-link">About</a></li>
+      <li><a href="#journey" class="nav-link">Journey</a></li>
+      <li><a href="#projects" class="nav-link">Projects</a></li>
+      <li><a href="#world" class="nav-link">My World</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home" class="mobile-link">Home</a>
+    <a href="#about" class="mobile-link">About</a>
+    <a href="#journey" class="mobile-link">Journey</a>
+    <a href="#projects" class="mobile-link">Projects</a>
+    <a href="#world" class="mobile-link">My World</a>
+    <a href="#contact" class="mobile-link">Contact</a>
+  </div>
+
+  <!-- ====== HERO ====== -->
+  <section id="home" class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge reveal">
+          <span class="badge-dot"></span>
+          Open to opportunities
+        </div>
+        <h1 class="hero-title">
+          <span class="line reveal">Hi, I'm <em>Yifan</em></span>
+          <span class="line reveal reveal-delay-1">I turn <span class="rotating-words" id="rotatingWords"><span class="rw-word active">data</span><span class="rw-word">ideas</span><span class="rw-word">curiosity</span><span class="rw-word">chaos</span></span> into stories.</span>
+        </h1>
+        <p class="hero-desc reveal reveal-delay-2">
+          I like playing with data, trying out every new AI tool I can find, and making things just to see if I can. When I'm not staring at a screen, I'm probably traveling somewhere, taking photos of food, or editing a video nobody asked for.
+        </p>
+        <div class="hero-actions reveal reveal-delay-3">
+          <a href="#projects" class="btn btn-warm magnetic">See My Work</a>
+          <a href="#about" class="btn btn-ghost magnetic">Get to Know Me</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-photo-wrapper">
+          <div class="hero-photo-frame reveal reveal-delay-2">
+            <img src="微信图片_20260121180359_382_47.jpg" alt="Yifan Yao" class="hero-photo" />
+          </div>
+          <div class="photo-deco-1"></div>
+          <div class="photo-deco-2"></div>
+          <div class="photo-deco-3"></div>
+          <div class="floating-tags">
+            <span class="ftag ftag-1">Python</span>
+            <span class="ftag ftag-2">Data Science</span>
+            <span class="ftag ftag-3">Photography</span>
+            <span class="ftag ftag-4">AI Explorer</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-cue">
+      <span class="scroll-text">Scroll to explore</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ====== MARQUEE ====== -->
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <span class="marquee-item"><span class="dot"></span>Data Science</span>
+      <span class="marquee-item"><span class="dot"></span>Econometrics</span>
+      <span class="marquee-item"><span class="dot"></span>LLM & NLP</span>
+      <span class="marquee-item"><span class="dot"></span>Photography</span>
+      <span class="marquee-item"><span class="dot"></span>Product Thinking</span>
+      <span class="marquee-item"><span class="dot"></span>AI Tools Explorer</span>
+      <span class="marquee-item"><span class="dot"></span>Vibe Coding</span>
+      <span class="marquee-item"><span class="dot"></span>Video Editing</span>
+      <!-- duplicate for seamless loop -->
+      <span class="marquee-item"><span class="dot"></span>Data Science</span>
+      <span class="marquee-item"><span class="dot"></span>Econometrics</span>
+      <span class="marquee-item"><span class="dot"></span>LLM & NLP</span>
+      <span class="marquee-item"><span class="dot"></span>Photography</span>
+      <span class="marquee-item"><span class="dot"></span>Product Thinking</span>
+      <span class="marquee-item"><span class="dot"></span>AI Tools Explorer</span>
+      <span class="marquee-item"><span class="dot"></span>Vibe Coding</span>
+      <span class="marquee-item"><span class="dot"></span>Video Editing</span>
+    </div>
+  </div>
+
+  <!-- ====== ABOUT ====== -->
+  <section id="about" class="section about-section">
+    <div class="container">
+      <div class="section-label reveal"><span>01</span> About Me</div>
+      <div class="about-layout">
+        <div class="about-left">
+          <h2 class="about-heading reveal">
+            A curious mind at the intersection of <em>economics</em>, <em>math</em>, and <em>creativity</em>.
+          </h2>
+          <div class="about-bio reveal reveal-delay-1">
+            <p>I'm Yifan Yao -- a junior studying AREC and Mathematics at the University of Maryland, College Park. I transferred from China Agricultural University (GPA 3.94) and currently hold a 4.0 at UMD. I blend quantitative rigor with creative thinking.</p>
+            <p>Raised with Chinese roots and studying in the U.S., my dual cultural background lets me approach problems with diverse perspectives. I'm an avid AI tools explorer (3+ years with Doubao & Gemini, 2+ years with ChatGPT, and now diving into Claude), a photography hobbyist, a foodie, and someone who genuinely enjoys learning things -- even if I haven't mastered them all yet.</p>
+            <p>I believe that being a "jack of many trades" isn't a weakness -- it's how unexpected connections happen.</p>
+          </div>
+        </div>
+        <div class="about-right">
+          <div class="about-cards">
+            <div class="about-card reveal tilt-card">
+              <div class="card-icon">&#127891;</div>
+              <h3>Education</h3>
+              <p><strong>China Agricultural University</strong><br/>Agricultural & Forestry Economics<br/>GPA: 3.94 / 4.0 (Top 5%)<br/><span style="font-size:0.75rem;color:var(--text-lighter)">Sep 2023 - Jun 2025</span></p>
+              <p style="margin-top:12px"><strong>University of Maryland</strong><br/>AREC & Mathematics (Transfer)<br/>GPA: 4.0 / 4.0 | Junior<br/><span style="font-size:0.75rem;color:var(--text-lighter)">Sep 2025 - Present</span></p>
+              <p style="margin-top:12px"><strong>IELTS: 7.5</strong> | 1 year studying abroad<br/><span style="font-size:0.75rem;color:var(--text-lighter)">Fluent in English for work & communication</span></p>
+              <p class="card-small">National Scholarship (Top 0.2%)</p>
+            </div>
+            <div class="about-card reveal reveal-delay-1 tilt-card">
+              <div class="card-icon">&#128200;</div>
+              <h3>Focus Areas</h3>
+              <div class="tag-cloud">
+                <span>Data Science</span><span>Econometrics</span><span>NLP / LLM</span><span>Product Thinking</span><span>Visualization</span><span>ESG Analysis</span>
+              </div>
+            </div>
+            <div class="about-card reveal reveal-delay-2 tilt-card">
+              <div class="card-icon">&#128736;</div>
+              <h3>Tech Stack</h3>
+              <div class="tech-pills">
+                <span class="pill">Python</span><span class="pill">R</span><span class="pill">SQL</span><span class="pill">C</span><span class="pill">Excel</span><span class="pill">Tableau</span><span class="pill">LaTeX</span><span class="pill">Canva</span><span class="pill">Photoshop</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FUN FACTS ====== -->
+  <!-- ====== JOURNEY ====== -->
+  <section id="journey" class="section journey-section">
+    <div class="container">
+      <div class="section-label reveal"><span>02</span> My Journey</div>
+      <h2 class="section-heading reveal">Where I've been, what I've built.</h2>
+
+      <div class="timeline">
+        <div class="timeline-line"></div>
+
+        <div class="tl-item tl-left reveal">
+          <div class="tl-card">
+            <div class="tl-date">Jun - Aug 2025</div>
+            <div class="tl-company">ByteDance (Douyin Group)</div>
+            <div class="tl-role">Data Science Analyst Intern</div>
+            <p>Built an LLM-based sentiment analysis system for the "Macro Daily" project, processing 3,000+ macroeconomic articles. Analyzed TikTok Shop creator efficiency across 50,000 top creators. Automated qualitative survey analysis with Python & LLMs.</p>
+            <div class="tl-tags"><span>LLM</span><span>Python</span><span>R</span><span>NLP</span></div>
+          </div>
+        </div>
+
+        <div class="tl-item tl-right reveal">
+          <div class="tl-card">
+            <div class="tl-date">Jan - Feb 2025</div>
+            <div class="tl-company">COFCO Futures Co., Ltd.</div>
+            <div class="tl-role">Industry Analysis Intern</div>
+            <p>Agricultural futures research on corn & soybean price trends. Data cleaning, volatility modeling, and visualization using Excel and Python.</p>
+            <div class="tl-tags"><span>Futures</span><span>Modeling</span><span>Python</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PROJECTS ====== -->
+  <section id="projects" class="section projects-section">
+    <div class="container">
+      <div class="section-label reveal"><span>03</span> Featured Projects</div>
+      <h2 class="section-heading reveal">Things I've made with data, code & curiosity.</h2>
+
+      <div class="projects-grid">
+        <div class="proj-card proj-large reveal tilt-card" onclick="openModal('modal-llm')">
+          <div class="proj-visual" style="--grad: linear-gradient(135deg, #FF8C6B 0%, #FFB347 100%)">
+            <div class="proj-visual-inner">
+              <div class="proj-icon-big">&#129302;</div>
+              <div class="proj-diagram">
+                <span>Articles</span>
+                <span class="arrow">&rarr;</span>
+                <span>LLM</span>
+                <span class="arrow">&rarr;</span>
+                <span>Insights</span>
+              </div>
+            </div>
+          </div>
+          <div class="proj-info">
+            <div class="proj-category">NLP / Data Science</div>
+            <h3>LLM-Based Macro Sentiment Analysis</h3>
+            <p>Built an automated pipeline that processes macroeconomic articles through prompt-engineered LLMs, generating sentiment scores and thematic heatmaps.</p>
+            <div class="proj-tech"><span>Python</span><span>LLM</span><span>Prompt Engineering</span><span>NLP</span></div>
+            <div class="proj-cta">Click to explore &rarr;</div>
+          </div>
+        </div>
+
+        <div class="proj-card reveal tilt-card" onclick="openModal('modal-airquality')">
+          <div class="proj-visual" style="--grad: linear-gradient(135deg, #A8D8EA 0%, #AA96DA 100%)">
+            <div class="proj-visual-inner">
+              <div class="proj-icon-big">&#127758;</div>
+            </div>
+          </div>
+          <div class="proj-info">
+            <div class="proj-category">Econometrics</div>
+            <h3>Air Quality & Housing Prices</h3>
+            <p>Empirical analysis across U.S. counties proving air quality independently affects housing prices.</p>
+            <div class="proj-tech"><span>R</span><span>OLS</span><span>Data Viz</span></div>
+            <div class="proj-cta">Click to explore &rarr;</div>
+          </div>
+        </div>
+
+        <div class="proj-card reveal tilt-card" onclick="openModal('modal-gre')">
+          <div class="proj-visual" style="--grad: linear-gradient(135deg, #C3F0CA 0%, #70C1B3 100%)">
+            <div class="proj-visual-inner">
+              <div class="proj-icon-big">&#128218;</div>
+            </div>
+          </div>
+          <div class="proj-info">
+            <div class="proj-category">Web App</div>
+            <h3>GRE Prep Web App</h3>
+            <p>A mobile-first vocabulary learning app with daily word plans, progress tracking, and spaced repetition.</p>
+            <div class="proj-tech"><span>HTML/CSS</span><span>JavaScript</span><span>UI Design</span></div>
+            <div class="proj-cta">Click to explore &rarr;</div>
+          </div>
+        </div>
+
+        <div class="proj-card reveal tilt-card" onclick="openModal('modal-precip')">
+          <div class="proj-visual" style="--grad: linear-gradient(135deg, #C62828 0%, #E57373 100%)">
+            <div class="proj-visual-inner">
+              <div class="proj-icon-big">&#127782;&#65039;</div>
+            </div>
+          </div>
+          <div class="proj-info">
+            <div class="proj-category">Time-Series / Machine Learning</div>
+            <h3>Seasonal Precipitation Modeling</h3>
+            <p>LSTM vs SARIMA vs BSTS -- predicting extreme rainfall in California's Central Valley for agricultural planning.</p>
+            <div class="proj-tech"><span>Python</span><span>LSTM</span><span>SARIMA</span><span>BSTS</span></div>
+            <div class="proj-cta">Click to explore &rarr;</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== PROJECT MODALS ====== -->
+      <div class="modal-overlay" id="modal-llm" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+          <button class="modal-close" onclick="closeModal(event, true)">&times;</button>
+          <div class="modal-header" style="background: linear-gradient(135deg, #FF8C6B, #FFB347)">
+            <div class="modal-icon">&#129302;</div>
+            <h2>LLM-Based Macro Sentiment Analysis</h2>
+            <p class="modal-subtitle">ByteDance (Douyin Group) | Jun - Aug 2025</p>
+          </div>
+          <div class="modal-body">
+            <h3>Taking Initiative & Solving Bottlenecks</h3>
+            <p>During my internship at ByteDance, I noticed a real problem: the Strategy Team was overwhelmed by the need to manually read and tag thousands of macroeconomic reports to track market sentiment. It was slow, subjective, and inefficient.</p>
+            <p>Instead of waiting for someone else to fix it, I designed and deployed an automated scoring system for the "Macro Daily" Feishu Push Assistant using Large Language Models.</p>
+            <h3>What I Built</h3>
+            <ul>
+              <li>Created a testing framework to refine prompt configurations through <strong>multi-version comparison</strong>, ensuring scoring matched professional human judgment</li>
+              <li>Processed and analyzed over <strong>3,000+ macroeconomic articles</strong></li>
+              <li>Generated automated monthly sentiment trend charts and thematic heatmaps the team now uses for decision-making</li>
+              <li>Built visual dashboards using the internal BI tool "Fengshen" for the Macroeconomic Monthly Report</li>
+              <li>Conducted focused analysis on trade, total social financing (TSF), and money supply (M1, M2)</li>
+            </ul>
+            <h3>Why This Matters</h3>
+            <p>This wasn't a class assignment -- it was a real business tool used by a real strategy team. It showed me that identifying workflow inefficiencies and designing scalable solutions is just as important as technical skills.</p>
+            <h3>Tech Stack</h3>
+            <div class="proj-tech"><span>Python</span><span>LLM</span><span>Prompt Engineering</span><span>NLP</span><span>R</span><span>Data Visualization</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay" id="modal-airquality" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+          <button class="modal-close" onclick="closeModal(event, true)">&times;</button>
+          <div class="modal-header" style="background: linear-gradient(135deg, #A8D8EA, #AA96DA)">
+            <div class="modal-icon">&#127758;</div>
+            <h2>Air Quality & Housing Prices</h2>
+            <p class="modal-subtitle">Turning Chaos into Order</p>
+          </div>
+          <div class="modal-body">
+            <h3>The Real Challenge</h3>
+            <p>In most data science courses, datasets come pre-cleaned and simplified. I wanted to challenge myself with the messy reality of federal data to answer a complex question: <em>Does air quality genuinely impact housing prices?</em></p>
+            <p>I consolidated <strong>sixteen separate years of raw CSV files</strong> from the EPA, FHFA, and BEA, handling non-standard missing values and sanitizing inconsistent formatting that would have broken a standard model.</p>
+            <h3>Key Findings</h3>
+            <ul>
+              <li><strong>Cleaner Air, Higher Prices:</strong> Better air quality (lower AQI) is associated with significantly higher housing prices</li>
+              <li><strong>Independent Effect:</strong> Controlling for income and other factors, the effect remains statistically significant (coefficient: 0.389) -- air quality affects housing independently of wealth</li>
+              <li><strong>Policy Implication:</strong> Environmental improvements generate direct asset value appreciation, providing economic justification for stricter regulations</li>
+            </ul>
+            <h3>Why This Matters to Me</h3>
+            <p>This project represents my capability to manage the entire data science lifecycle -- not just the final modeling stage. It demonstrates the technical resilience to wrangle unstructured information into clean, analytical format, and translate chaotic real-world data into clear, policy-relevant economic insights.</p>
+            <h3>Tech Stack</h3>
+            <div class="proj-tech"><span>R</span><span>tidyverse</span><span>OLS Regression</span><span>Data Visualization</span><span>Econometrics</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay" id="modal-gre" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+          <button class="modal-close" onclick="closeModal(event, true)">&times;</button>
+          <div class="modal-header" style="background: linear-gradient(135deg, #C3F0CA, #70C1B3)">
+            <div class="modal-icon">&#128218;</div>
+            <h2>GRE Prep Web App</h2>
+            <p class="modal-subtitle">Product Thinking & Willing to Try</p>
+          </div>
+          <div class="modal-body">
+            <h3>Born from Personal Frustration</h3>
+            <p>As a non-native speaker preparing for the GRE, I found that existing tools to learn vocabularies were rigid. Traditional PDFs lacked interactivity, and mainstream apps didn't allow me to upload my own custom vocabulary lists.</p>
+            <p>Instead of waiting for a better tool, I decided to build one: a web app designed to help non-native speakers master GRE synonyms. I adopted a Product Manager mindset, identified a specific gap in the market for international students, and leveraged AI-assisted coding ("vibe coding") to rapidly prototype and deploy it.</p>
+            <h3>Key Features</h3>
+            <ul>
+              <li><strong>Smart Dashboard:</strong> Progress tracking with daily/cumulative word counts, auto-resetting daily counter</li>
+              <li><strong>AI-Powered Story Generator:</strong> Creates short narratives using your recently studied words with customizable themes (e.g., "Harry Potter style")</li>
+              <li><strong>Smart Excel Import:</strong> Upload custom .xlsx vocabulary files -- no dependence on pre-built lists</li>
+              <li><strong>Immersive Flashcards:</strong> 3D flip card interface with star-marking for difficult words</li>
+              <li><strong>Privacy First:</strong> BYOK (Bring Your Own Key) system -- API keys stored locally, never transmitted</li>
+            </ul>
+            <h3>App Screenshots</h3>
+            <img src="images/gre-prep-screenshot.png" alt="GRE Prep Web App Screenshots" style="width:100%;border-radius:12px;margin:12px 0;box-shadow:0 4px 16px rgba(0,0,0,0.1)"/>
+            <h3>Why This Matters</h3>
+            <p>This project is proof that I can turn a personal observation into a functional solution. It demonstrates market insight, ability to execute, and the willingness to look beyond lines of code to understand user pain points.</p>
+            <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap">
+              <a href="https://gre-god-help-3zfv2bp8l-yifans-projects-5baccfbb.vercel.app/" target="_blank" rel="noopener" class="btn btn-warm" style="font-size:0.8rem;padding:10px 24px">Live Demo</a>
+              <a href="https://github.com/yaoyf1207" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:0.8rem;padding:10px 24px">GitHub</a>
+            </div>
+            <h3 style="margin-top:24px">Tech Stack</h3>
+            <div class="proj-tech"><span>HTML/CSS</span><span>JavaScript</span><span>AI-Assisted Coding</span><span>UI/UX Design</span><span>Vercel</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-overlay" id="modal-precip" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+          <button class="modal-close" onclick="closeModal(event, true)">&times;</button>
+          <div class="modal-header" style="background: linear-gradient(135deg, #C62828, #E57373)">
+            <div class="modal-icon">&#127782;&#65039;</div>
+            <h2>Time-Series Modeling of Seasonal Precipitation</h2>
+            <p class="modal-subtitle">GEARS Project | Supervisor: Prof. Min Chi | NC State University</p>
+          </div>
+          <div class="modal-body">
+            <h3>The Problem</h3>
+            <p>Accurate precipitation prediction in the dry California Central Valley is vital for regional agricultural production. Farmers need to know when extreme rainfall will hit -- not just seasonal averages, but the actual storms that matter.</p>
+            <h3>What I Did</h3>
+            <ul>
+              <li>Extracted 10-year weekly precipitation data (2016-2025) revealing a highly <strong>right-skewed distribution</strong> (Skewness = 2.85)</li>
+              <li>Applied log1p transformation to stabilize variance</li>
+              <li>Identified a clear 52-week annual cycle for seasonal modeling</li>
+            </ul>
+            <h3>Models Compared</h3>
+            <ul>
+              <li><strong>LSTM (Long Short-Term Memory):</strong> MAE 0.9675, RMSE 1.7596 -- best at capturing extreme precipitation peaks</li>
+              <li><strong>BSTS (Bayesian Structural Time Series):</strong> MAE 0.72, RMSE 1.45 -- accurate for weekly trends but too "smooth" for extremes</li>
+              <li><strong>SARIMA:</strong> MAE 2.92, RMSE 4.76</li>
+              <li><strong>ARIMA:</strong> MAE 3.04, RMSE 4.30</li>
+            </ul>
+            <h3>Key Finding</h3>
+            <p>While BSTS is accurate for seasonal trends, it is too conservative for risk management. <strong>LSTM is the superior model</strong> because it captures the stochastic volatility and precipitation peaks that other models miss. Since predicting storms is more critical for agriculture than tracking averages, LSTM is the right architecture for high-stakes forecasting.</p>
+            <h3>Validation</h3>
+            <p>5-year Rolling Cross-Validation (2021-2025) with Log-Min-Max preprocessing and Adam/MCMC optimization.</p>
+            <h3>Research Poster</h3>
+            <img src="images/precipitation-poster.png" alt="Precipitation Poster" style="width:100%;border-radius:12px;margin:12px 0;box-shadow:0 4px 16px rgba(0,0,0,0.1);cursor:pointer" onclick="window.open(this.src,'_blank')"/>
+            <p style="font-size:0.75rem;color:var(--text-lighter)">Click to view full size</p>
+            <h3>Tech Stack</h3>
+            <div class="proj-tech"><span>Python</span><span>LSTM</span><span>BSTS</span><span>SARIMA</span><span>ARIMA</span><span>NumPy</span><span>TensorFlow</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== MY WORLD ====== -->
+  <section id="world" class="section world-section">
+    <div class="container">
+      <div class="section-label reveal"><span>04</span> My World</div>
+      <h2 class="section-heading reveal">Things that make me, <em>me</em>.</h2>
+      <p class="world-intro reveal">Jack of many trades, master of... well, I'm still working on that part.</p>
+
+      <div class="world-grid">
+        <!-- 摄影 Photography -->
+        <div class="flip-card reveal" onclick="flipCard(this, event)">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="wc-emoji">&#128247;</div>
+              <h3 class="world-card-title">Photography</h3>
+              <div class="flip-hint">click to flip</div>
+            </div>
+            <div class="flip-card-back">
+              <div class="carousel" data-index="0">
+                <div class="carousel-track">
+                  <div class="carousel-slide"><img src="images/摄影/2ae25f2ab2e40fb2ad92512bb1556cb5.jpg" alt="Photo 1"/></div>
+                  <div class="carousel-slide"><img src="images/摄影/b8e50960892a7f8a9b57f03cb85624b2.jpg" alt="Photo 2"/></div>
+                  <div class="carousel-slide"><img src="images/摄影/e77136ac8ec346367e69b72ce6db12d2.jpg" alt="Photo 3"/></div>
+                </div>
+                <button class="carousel-arrow prev" onclick="event.stopPropagation();carouselNav(this,-1)">&#8249;</button>
+                <button class="carousel-arrow next" onclick="event.stopPropagation();carouselNav(this,1)">&#8250;</button>
+                <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span><span class="carousel-dot"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 旅行 Travel -->
+        <div class="flip-card reveal reveal-delay-1" onclick="flipCard(this, event)">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="wc-emoji">&#9992;&#65039;</div>
+              <h3 class="world-card-title">Travel</h3>
+              <div class="flip-hint">click to flip</div>
+            </div>
+            <div class="flip-card-back">
+              <div class="carousel" data-index="0">
+                <div class="carousel-track">
+                  <div class="carousel-slide"><img src="images/旅行/9a2f65059897ebb4b853f1e6f0412636.jpg" alt="Travel 1"/></div>
+                  <div class="carousel-slide"><img src="images/旅行/aa37020431561148e9fd547c83735afe.jpg" alt="Travel 2"/></div>
+                  <div class="carousel-slide"><img src="images/旅行/ac1e533187ca43d5b2ec9048d01a3b7e.jpg" alt="Travel 3"/></div>
+                  <div class="carousel-slide"><img src="images/旅行/cd25acad68e981d93ede472ca11ff9d7.jpg" alt="Travel 4"/></div>
+                  <div class="carousel-slide"><img src="images/旅行/dd68bed9c1ebdb32ab69ef95a6314cf5.jpg" alt="Travel 5"/></div>
+                </div>
+                <button class="carousel-arrow prev" onclick="event.stopPropagation();carouselNav(this,-1)">&#8249;</button>
+                <button class="carousel-arrow next" onclick="event.stopPropagation();carouselNav(this,1)">&#8250;</button>
+                <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span><span class="carousel-dot"></span><span class="carousel-dot"></span><span class="carousel-dot"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 烹饪 Cooking -->
+        <div class="flip-card reveal reveal-delay-2" onclick="flipCard(this, event)">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="wc-emoji">&#127859;</div>
+              <h3 class="world-card-title">Cooking</h3>
+              <div class="flip-hint">click to flip</div>
+            </div>
+            <div class="flip-card-back">
+              <div class="carousel" data-index="0">
+                <div class="carousel-track">
+                  <div class="carousel-slide"><img src="images/烹饪/c48daa3a9a33040f7e8af7330d6fde3a.jpg" alt="Cooking 1"/></div>
+                  <div class="carousel-slide"><img src="images/烹饪/3d0c56512f2daffd3cdd1fdaab7cc11b.jpg" alt="Cooking 2"/></div>
+                </div>
+                <button class="carousel-arrow prev" onclick="event.stopPropagation();carouselNav(this,-1)">&#8249;</button>
+                <button class="carousel-arrow next" onclick="event.stopPropagation();carouselNav(this,1)">&#8250;</button>
+                <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 访学 Summer Program -->
+        <div class="flip-card reveal" onclick="flipCard(this, event)">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="wc-emoji">&#127979;</div>
+              <h3 class="world-card-title">Summer Program</h3>
+              <div class="flip-hint">click to flip</div>
+            </div>
+            <div class="flip-card-back">
+              <div class="carousel" data-index="0">
+                <div class="carousel-track">
+                  <div class="carousel-slide"><img src="images/访学/54baa0ae1cf2b02204932352f5408a28.jpg" alt="Program 1"/></div>
+                  <div class="carousel-slide"><img src="images/访学/dff3cdf567dfe0cdf0b22f4a615a501c.jpg" alt="Program 2"/></div>
+                </div>
+                <button class="carousel-arrow prev" onclick="event.stopPropagation();carouselNav(this,-1)">&#8249;</button>
+                <button class="carousel-arrow next" onclick="event.stopPropagation();carouselNav(this,1)">&#8250;</button>
+                <div class="carousel-dots"><span class="carousel-dot active"></span><span class="carousel-dot"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 辩论 Debate -->
+        <div class="flip-card reveal reveal-delay-1" onclick="flipCard(this, event)">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="wc-emoji">&#128172;</div>
+              <h3 class="world-card-title">Debate</h3>
+              <div class="flip-hint">click to flip</div>
+            </div>
+            <div class="flip-card-back">
+              <div class="carousel" data-index="0">
+                <div class="carousel-track">
+                  <div class="carousel-slide"><img src="images/辩论/2112803c97ef01555c2714ccc012deb1.jpg" alt="Debate 1"/></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 运动 Sports -->
+        <div class="flip-card reveal reveal-delay-2" onclick="flipCard(this, event)">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="wc-emoji">&#127939;</div>
+              <h3 class="world-card-title">Sports</h3>
+              <div class="flip-hint">click to flip</div>
+            </div>
+            <div class="flip-card-back">
+              <div class="carousel" data-index="0">
+                <div class="carousel-track">
+                  <div class="carousel-slide"><img src="images/运动/98f25693d8a7127529458eb606e5871c.jpg" alt="Sports 1"/></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="world-quote reveal">
+        <blockquote>
+          "I don't need to master everything -- I just need to stay curious enough to keep trying."
+        </blockquote>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ====== CONTACT ====== -->
+  <section id="contact" class="section contact-section">
+    <div class="container">
+      <div class="section-label reveal" style="justify-content: center;"><span>05</span> Say Hello</div>
+      <h2 class="section-heading contact-heading reveal">
+        Let's create something <em>wonderful</em> together.
+      </h2>
+      <p class="contact-desc reveal">Whether it's a data project, a creative collaboration, or just a chat about the latest AI tool -- I'd love to hear from you.</p>
+
+      <div class="contact-links reveal">
+        <a href="mailto:yaoyf1207@gmail.com" class="contact-btn magnetic">
+          <span class="cb-icon">&#9993;</span>
+          <span class="cb-text">yaoyf1207@gmail.com</span>
+        </a>
+        <a href="https://www.linkedin.com/in/yifan-yao-445895382/" class="contact-btn magnetic" target="_blank" rel="noopener">
+          <span class="cb-icon">in</span>
+          <span class="cb-text">LinkedIn</span>
+        </a>
+        <a href="https://github.com/yaoyf1207" class="contact-btn magnetic" target="_blank" rel="noopener">
+          <span class="cb-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.1.82-.26.82-.58v-2.03c-3.34.72-4.04-1.6-4.04-1.6-.54-1.38-1.33-1.75-1.33-1.75-1.08-.74.08-.73.08-.73 1.2.08 1.83 1.23 1.83 1.23 1.07 1.83 2.8 1.3 3.48 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.3-1.23 3.3-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.9 1.23 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.3c0 .32.22.69.83.57C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </span>
+          <span class="cb-text">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>Designed & built by Yifan Yao &copy; <span id="year"></span></p>
+      <p class="footer-sub">Made with curiosity, coffee, and a little help from AI</p>
+    </div>
+  </footer>
+
+  <script>
+    // ========== LOADER ==========
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('done');
+      }, 1400);
+    });
+
+    // ========== YEAR ==========
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ========== NAV SCROLL ==========
+    const navbar = document.getElementById('navbar');
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      navbar.classList.toggle('scrolled', scrollY > 50);
+
+      // Active nav link
+      sections.forEach(section => {
+        const top = section.offsetTop - 200;
+        const bottom = top + section.offsetHeight;
+        const id = section.getAttribute('id');
+        if (scrollY >= top && scrollY < bottom) {
+          navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    });
+
+
+    // ========== FLIP CARD & CAROUSEL ==========
+    function flipCard(card, event) {
+      // Don't flip if clicking carousel arrows
+      if (event.target.closest('.carousel-arrow')) return;
+      card.classList.toggle('flipped');
+    }
+
+    function carouselNav(btn, dir) {
+      const carousel = btn.closest('.carousel');
+      const track = carousel.querySelector('.carousel-track');
+      const slides = track.querySelectorAll('.carousel-slide');
+      const dots = carousel.querySelectorAll('.carousel-dot');
+      let idx = parseInt(carousel.dataset.index) || 0;
+      idx += dir;
+      if (idx < 0) idx = slides.length - 1;
+      if (idx >= slides.length) idx = 0;
+      carousel.dataset.index = idx;
+      track.style.transform = `translateX(-${idx * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+
+    // Touch swipe for carousels
+    document.querySelectorAll('.carousel').forEach(carousel => {
+      let startX = 0;
+      carousel.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive: true});
+      carousel.addEventListener('touchend', e => {
+        const diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) {
+          const btn = carousel.querySelector(diff > 0 ? '.carousel-arrow.next' : '.carousel-arrow.prev');
+          if (btn) btn.click();
+        }
+      }, {passive: true});
+    });
+
+    // ========== HAMBURGER ==========
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // ========== ROTATING WORDS ==========
+    const words = document.querySelectorAll('.rw-word');
+    let currentWord = 0;
+    setInterval(() => {
+      words[currentWord].classList.remove('active');
+      words[currentWord].classList.add('exit');
+      setTimeout(() => words[currentWord].classList.remove('exit'), 500);
+      currentWord = (currentWord + 1) % words.length;
+      words[currentWord].classList.add('active');
+    }, 2500);
+
+    // ========== SCROLL REVEAL ==========
+    const revealElements = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // ========== COUNTER ANIMATION ==========
+    const counters = document.querySelectorAll('.fact-number');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.target);
+          const duration = 2000;
+          const start = performance.now();
+
+          function update(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+            const current = Math.round(eased * target);
+
+            if (target >= 1000) {
+              el.textContent = current.toLocaleString() + '+';
+            } else {
+              el.textContent = current + (target === 394 ? '' : '+');
+            }
+
+            if (progress < 1) requestAnimationFrame(update);
+          }
+          requestAnimationFrame(update);
+          counterObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(c => counterObserver.observe(c));
+
+    // ========== TILT CARD EFFECT ==========
+    document.querySelectorAll('.tilt-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / centerY * -5;
+        const rotateY = (x - centerX) / centerX * 5;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+      });
+    });
+
+    // ========== MAGNETIC BUTTONS ==========
+    document.querySelectorAll('.magnetic').forEach(btn => {
+      btn.addEventListener('mousemove', e => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = '';
+      });
+    });
+
+    // ========== SPARKLE ON CLICK ==========
+    const sparkleColors = ['#FF8C6B', '#FFB347', '#C3B1E1', '#A8D8EA', '#F4A0A0', '#A8C5A0'];
+    document.addEventListener('click', e => {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.style.left = e.clientX + 'px';
+      sparkle.style.top = e.clientY + 'px';
+
+      for (let i = 0; i < 8; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'sparkle-particle';
+        const angle = (Math.PI * 2 / 8) * i;
+        const distance = 20 + Math.random() * 30;
+        particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+        particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+        particle.style.background = sparkleColors[Math.floor(Math.random() * sparkleColors.length)];
+        sparkle.appendChild(particle);
+      }
+
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 700);
+    });
+
+    // ========== PARALLAX BLOBS ==========
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      document.querySelectorAll('.blob').forEach((blob, i) => {
+        const speed = 0.03 + i * 0.01;
+        blob.style.transform = `translateY(${scrollY * speed}px)`;
+      });
+    });
+
+    // ========== PROJECT MODALS ==========
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.style.display = 'flex';
+      requestAnimationFrame(() => modal.classList.add('open'));
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(event, force) {
+      const overlay = force ? event.target.closest('.modal-overlay') : event.currentTarget;
+      overlay.classList.remove('open');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 300);
+    }
+    // Close on Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.open').forEach(m => {
+          m.classList.remove('open');
+          setTimeout(() => { m.style.display = 'none'; document.body.style.overflow = ''; }, 300);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
